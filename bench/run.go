@@ -26,6 +26,8 @@ func runContainer() {
 }
 
 func main() {
+	flag.Parse()
+
 	fmt.Printf("count=%d, parallel=%v\n", count, parallel)
 	if parallel {
 		wg := sync.WaitGroup{}
@@ -44,4 +46,5 @@ func main() {
 			runContainer()
 		}
 	}
+
 }

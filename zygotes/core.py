@@ -7,29 +7,23 @@ import traceback
 import syscall
 
 
-# import numpy
-# import scipy
-# import pandas
-# import django
-# import matplotlib
-
-
 def do_exec(param):
     param["afterForkTime"] = time.time_ns()
 
-    # 加载依赖包
+    # 加载函数包
+    sys.path.append(param["lambdaPath"])
+    # chroot以后这些包会找不到，需要特殊处理
     package_path = ['/usr/local/lib/python37.zip', '/usr/local/lib/python3.7',
                     '/usr/local/lib/python3.7/lib-dynload', '/usr/local/lib/python3.7/site-packages']
     for p in package_path:
         sys.path.append(p)
-    sys.path.append(param["lambdaPath"])
 
     result = {
         "id": param["id"],
     }
     try:
-        f = importlib.import_module(param["entrypoint"])
-        result["result"] = f.handler(param["event"])
+        handler = importlib.import_module(param["handler"])
+        result["result"] = handler.handler(param["event"])
     except Exception as e:
         traceback.format_exc()
         result["error"] = e
@@ -45,6 +39,7 @@ def do_exec(param):
           "total=" + str((param["afterHandlerTime"] - param["afterFirstForkTime"]) / 1e6)
           )
 
+    time.sleep(100)
     sys.exit(0)
 
 
@@ -91,11 +86,11 @@ def new_container(param):
 
 container_param = {
     "id": "aaa",
-    "logFile": "/go/src/container/aaa.log",
-    "lambdaPath": "/lambda",
-    "entrypoint": "f",
-    "cgroupFileList": ["/sys/fs/cgroup/memory/test1/tasks", "/sys/fs/cgroup/cpu/test1/tasks"],
     "rootPath": "/go/src/rootfs",
+    "cgroupFileList": ["/sys/fs/cgroup/memory/test1/tasks", "/sys/fs/cgroup/cpu/test1/tasks"],
+    "logFile": "/go/src/container/aaa.log",
+    "functionName": "echo",
+    "handler": "index",
     "event": {},
     "startTime": time.time_ns()
 }

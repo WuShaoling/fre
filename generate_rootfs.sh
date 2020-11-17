@@ -17,6 +17,6 @@ EOF
 cp -r lambda rootfs/
 
 ## install packages
-docker run -it --privileged -v $PWD:/root python:3.7 bash
+docker run -it --rm --privileged -v $PWD:/root python:3.7 bash
 chroot /root/rootfs bash
 pip3 install -i http://pypi.douban.com/simple --trusted-host pypi.douban.com scipy numpy pandas django matplotlib
