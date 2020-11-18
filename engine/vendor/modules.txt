@@ -1,6 +1,3 @@
-# github.com/Sirupsen/logrus v0.8.8-0.20151204141443-446d1c146faa
-## explicit
-github.com/Sirupsen/logrus
 # github.com/containerd/cgroups v0.0.0-20201109155418-13abef5d31ec
 ## explicit
 github.com/containerd/cgroups
@@ -35,6 +32,8 @@ github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/golang/protobuf/proto
 # github.com/json-iterator/go v1.1.9
 github.com/json-iterator/go
+# github.com/konsorten/go-windows-terminal-sequences v1.0.3
+github.com/konsorten/go-windows-terminal-sequences
 # github.com/leodido/go-urn v1.2.0
 github.com/leodido/go-urn
 # github.com/mattn/go-isatty v0.0.12
@@ -48,10 +47,14 @@ github.com/modern-go/reflect2
 github.com/opencontainers/runtime-spec/specs-go
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
+# github.com/sirupsen/logrus v1.6.0
+## explicit
+github.com/sirupsen/logrus
 # github.com/stretchr/testify v1.6.1
 ## explicit
 # github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf
 ## explicit
+github.com/teris-io/shortid
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
 # github.com/ventu-io/go-shortid v0.0.0-20171029131806-771a37caa5cf

@@ -16,10 +16,12 @@ nameserver 223.6.6.6
 nameserver 8.8.8.8
 EOF
 
+# 拷贝 bootstrap.py
+cp bootstrap.py ${name}/
+
 # 拷贝 demo 代码
-mkdir ${name}/code &&
-  cp -r code_registry/${name}/* ${name}/code
+cp -r code ${name}
 
 ## 安装 demo 代码的依赖包
-docker run -it --rm --privileged -v $PWD:/root python:3.7 bash -c \
+docker run -it --rm --privileged -v $PWD:/root ${image} bash -c \
   "chroot /root/${name} pip3 install -i http://pypi.douban.com/simple --trusted-host pypi.douban.com scipy numpy pandas django matplotlib"

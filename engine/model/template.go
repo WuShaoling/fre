@@ -1,9 +1,9 @@
 package model
 
 type Template struct { // 函数模版
-	Metadata
-	Environment
-	ResourceLimit
+	Metadata      Metadata      `json:"metadata"`      // 元信息
+	Environment   Environment   `json:"environment"`   // 环境信息
+	ResourceLimit ResourceLimit `json:"resourceLimit"` // 资源限制
 }
 
 type Metadata struct {
@@ -12,12 +12,12 @@ type Metadata struct {
 }
 
 type Environment struct {
-	Runtime    string            `json:"runtime" binding:"required"` // 基础环境
-	Handler    string            `json:"handler" binding:"required"` // 函数入口文件
-	Packages   []string          `json:"packages"`                   // 依赖包
-	SharedLibs []string          `json:"sharedLibs"`                 // 基础环境之外所需的共享库
-	Volume     string            `json:"volume"`                     // 数据卷挂载目录
-	Envs       map[string]string `json:"envs"`                       // 环境变量
+	Runtime    string   `json:"runtime" binding:"required"` // 基础环境
+	Handler    string   `json:"handler" binding:"required"` // 函数入口文件
+	Packages   []string `json:"packages"`                   // 依赖包
+	SharedLibs []string `json:"sharedLibs"`                 // 基础环境之外所需的共享库
+	Volume     string   `json:"volume"`                     // 数据卷挂载目录
+	Envs       []string `json:"envs"`                       // 环境变量, key=value
 }
 
 type ResourceLimit struct { // 资源限制
