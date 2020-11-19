@@ -16,12 +16,10 @@ type SysConfig struct {
 
 const (
 	LogPath         = "log"       // 日志根目录
-	DataPath        = "data"      // 数据目录
+	DataPath        = "metadata"  // 数据目录
 	RuntimePath     = "runtime"   // 运行时环境根目录
 	VolumeHostPath  = "volume"    // 数据卷主机端根目录
 	ContainerFsPath = "container" // 容器文件系统根目录
-
-	RuntimeFunctionPath = "/code" // 运行时环境里面代码根目录
 )
 
 var SysConfigInstance *SysConfig

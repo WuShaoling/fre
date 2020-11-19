@@ -10,13 +10,13 @@ import (
 
 type TemplateService struct {
 	engine  *Engine
-	dataMap map[string]model.Template
+	dataMap map[string]*model.Template
 }
 
 func NewTemplateService(engine *Engine) *TemplateService {
 	service := &TemplateService{
 		engine:  engine,
-		dataMap: make(map[string]model.Template),
+		dataMap: make(map[string]*model.Template),
 	}
 	loadDataFromFile(&service.dataMap, TemplateDataFileName)
 	return service
@@ -38,7 +38,7 @@ func (service *TemplateService) Create(ctx *gin.Context) {
 	// TODO 加载额外所需的共享库和依赖包
 
 	// 更新缓存
-	service.dataMap[functionInfo.Metadata.Name] = *functionInfo
+	service.dataMap[functionInfo.Metadata.Name] = functionInfo
 
 	// 写回文件
 	data, err := json.Marshal(service.dataMap)
@@ -68,4 +68,13 @@ func (service *TemplateService) Dump(ctx *gin.Context) {
 	} else {
 		ctx.String(http.StatusOK, "ok")
 	}
+}
+
+func (service *TemplateService) getTemplateByName(name string) *model.Template {
+	return service.dataMap[name]
+}
+
+func (service *TemplateService) checkIsTemplateExist(name string) bool {
+	_, ok := service.dataMap[name]
+	return ok
 }

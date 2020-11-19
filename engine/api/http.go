@@ -27,7 +27,8 @@ func SetContainerRouter(runtime *service.RuntimeService, template *service.Templ
 	containerGroup.GET("/", container.List)
 	containerGroup.POST("/", container.Create)
 	containerGroup.DELETE("/:id", container.Delete)
-	containerGroup.PUT("/callback/run/:id/:pid", container.OnContainerRun)
-	containerGroup.PUT("/callback/exit/:id", container.OnContainerExit)
-	containerGroup.GET("/Dump", container.Dump)
+	containerGroup.PUT("/callback/run/:id/:pid", container.ContainerRun)
+	containerGroup.PUT("/callback/result", container.FunctionResult)
+	containerGroup.PUT("/callback/exit/:id", container.ContainerExit)
+	containerGroup.GET("/dump", container.Dump)
 }

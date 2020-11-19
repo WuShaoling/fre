@@ -91,7 +91,7 @@ container_param = {
     "logFile": "/go/src/container/aaa.log",
     "functionName": "echo",
     "handler": "index",
-    "event": {},
+    "functionParam": {},
     "startTime": time.time_ns()
 }
 

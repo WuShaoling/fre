@@ -27,8 +27,8 @@ func NewCgroupService() *CgroupService {
 
 	// 构造缓存池
 	for i := 0; i < config.SysConfigInstance.CgroupPoolSize; i++ {
-		if id := service.newCgroup(nil); id == "" {
-			log.Fatal("new cgroup error")
+		if id, err := service.newCgroup(nil); id == "" {
+			log.Fatal("new cgroup error", err)
 		} else {
 			service.pool = append(service.pool, id)
 		}
@@ -38,7 +38,7 @@ func NewCgroupService() *CgroupService {
 }
 
 // 获取 cgroup
-func (service *CgroupService) Get(limit *model.ResourceLimit) string {
+func (service *CgroupService) Get(limit *model.ResourceLimit) (string, error) {
 	service.mutex.Lock()
 
 	n := len(service.pool)
@@ -47,7 +47,7 @@ func (service *CgroupService) Get(limit *model.ResourceLimit) string {
 		c := service.pool[n-1]
 		service.pool = service.pool[0 : n-1]
 		service.mutex.Unlock()
-		return c
+		return c, nil
 	}
 
 	service.mutex.Unlock()
@@ -97,7 +97,7 @@ func (service *CgroupService) getOrLoad(id string) *cgroups.Cgroup {
 	return &c
 }
 
-func (service *CgroupService) newCgroup(limit *model.ResourceLimit) string {
+func (service *CgroupService) newCgroup(limit *model.ResourceLimit) (string, error) {
 	id := shortid.MustGenerate()
 
 	linuxResource := &specs.LinuxResources{
@@ -112,9 +112,9 @@ func (service *CgroupService) newCgroup(limit *model.ResourceLimit) string {
 	cgroup, err := cgroups.New(cgroups.V1, cgroups.StaticPath(cgroupPrefix+id), linuxResource)
 	if err != nil {
 		log.Error("new cgroup error, ", err)
-		return ""
+		return "", err
 	}
 
 	service.dataMap[id] = &cgroup
-	return id
+	return id, nil
 }

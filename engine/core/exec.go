@@ -1,67 +1,82 @@
 package core
-//
-//import (
-//	"fmt"
-//	log "github.com/Sirupsen/logrus"
-//	"io/ioutil"
-//	"os"
-//	"os/exec"
-//	"path/filepath"
-//	"strings"
-//	"syscall"
-//)
-//
-//func RunContainerInitProcess() error {
-//	cmdArray := readUserCommand()
-//	if cmdArray == nil || len(cmdArray) == 0 {
-//		return fmt.Errorf("Run container get user command error, cmdArray is nil")
-//	}
-//
-//	setUpMount()
-//
-//	path, err := exec.LookPath(cmdArray[0])
-//	if err != nil {
-//		log.Errorf("Exec loop path error %v", err)
-//		return err
-//	}
-//	log.Infof("Find path %s", path)
-//	if err := syscall.Exec(path, cmdArray[0:], os.Environ()); err != nil {
-//		log.Errorf(err.Error())
-//	}
-//	return nil
-//}
-//
-//func readUserCommand() []string {
-//	pipe := os.NewFile(uintptr(3), "pipe")
-//	defer pipe.Close()
-//	msg, err := ioutil.ReadAll(pipe)
-//	if err != nil {
-//		log.Errorf("init read pipe error %v", err)
-//		return nil
-//	}
-//	msgStr := string(msg)
-//	return strings.Split(msgStr, " ")
-//}
-//
-///**
-//Init 挂载点
-//*/
-//func setUpMount() {
-//	pwd, err := os.Getwd()
-//	if err != nil {
-//		log.Errorf("Get current location error %v", err)
-//		return
-//	}
-//	log.Infof("Current location is %s", pwd)
-//	pivotRoot(pwd)
-//
-//	//merge proc
-//	defaultMountFlags := syscall.MS_NOEXEC | syscall.MS_NOSUID | syscall.MS_NODEV
-//	syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
-//
-//	syscall.Mount("tmpfs", "/dev", "tmpfs", syscall.MS_NOSUID|syscall.MS_STRICTATIME, "mode=755")
-//}
-//
+
+import (
+	log "github.com/Sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"strings"
+	"syscall"
+)
+
+func Exec() error {
+	// read command from pipe
+	command, err := readFunctionContextFromPipe()
+	if err != nil {
+		return err
+	}
+
+	// chroot
+	if err := setUpMount(); err != nil {
+		return err
+	}
+
+	// 查找可执行文件
+	path, err := exec.LookPath(command[0])
+	if err != nil {
+		log.Errorf("Exec loop path error %v", err)
+		return err
+	}
+	log.Infof("Find path %s", path)
+
+	if err := syscall.Exec(path, command[0:], os.Environ()); err != nil {
+		log.Errorf("syscall.Exec failed, error=%v", err.Error())
+		return err
+	}
+	return nil
+}
+
+func readFunctionContextFromPipe() ([]string, error) {
+	pipe := os.NewFile(uintptr(3), "pipe")
+	defer pipe.Close()
+
+	data, err := ioutil.ReadAll(pipe)
+	if err != nil {
+		log.Errorf("exec read pipe error %v", err)
+		return nil, err
+	}
+
+	command := string(data)
+
+	separatorIndex := strings.Index(command, "|")
+	entrypoint := command[:separatorIndex]
+	entrypointParam := command[separatorIndex+1:]
+
+	// ["python3", "bootstrap.py", "json化后的参数，可以包含空格"]
+	return append(strings.Split(entrypoint, " "), entrypointParam), nil
+}
+
+func setUpMount() error {
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Errorf("Get current location error %v", err)
+		return err
+	}
+	log.Infof("Current location is %s", pwd)
+
+	err = syscall.Chroot(pwd)
+	if err != nil {
+		log.Errorf("chroot to %s error %v", pwd, err)
+	}
+	return err
+	//err = pivotRoot(pwd)
+
+	//merge proc
+	//defaultMountFlags := syscall.MS_NOEXEC | syscall.MS_NOSUID | syscall.MS_NODEV
+	//syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
+	//syscall.Mount("tmpfs", "/dev", "tmpfs", syscall.MS_NOSUID|syscall.MS_STRICTATIME, "mode=755")
+}
+
 //func pivotRoot(root string) error {
 //	/**
 //	  为了使当前root的老 root 和新 root 不在同一个文件系统下，我们把root重新mount了一次
