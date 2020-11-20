@@ -14,7 +14,7 @@ var parallel bool
 var count int
 
 func init() {
-	flag.IntVar(&count, "n", 10, "启动的容器数量")
+	flag.IntVar(&count, "n", 1, "启动的容器数量")
 	flag.BoolVar(&parallel, "p", false, "并发启动")
 }
 
@@ -46,7 +46,9 @@ func mount(id int) {
 	}
 
 	t2 := time.Now().UnixNano()
-	data := fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", "../../rootfs", upperPath, workerPath)
+	data := fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", "../rootfs", upperPath, workerPath)
+	fmt.Println(data)
+	fmt.Println(mountPath)
 	if err := syscall.Mount("overlay", mountPath, "overlay", 0, data); err != nil {
 		log.Println(err)
 	}
