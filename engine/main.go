@@ -3,7 +3,7 @@ package main
 import (
 	"engine/api"
 	"engine/config"
-	"engine/core"
+	"engine/container"
 	"engine/service"
 	"flag"
 	"github.com/gin-gonic/gin"
@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	if len(os.Args) >= 2 && os.Args[1] == "exec" { // 容器进程
-		_ = core.Exec()
+		_ = container.Exec()
 		return
 	}
 
@@ -31,8 +31,8 @@ func main() {
 
 	freEngine := service.NewEngine()
 	r := gin.Default()
-	api.SetContainerRouter(freEngine.RuntimeService, freEngine.TemplateService, freEngine.ContainerService, r)
+	api.SetContainerRouter(freEngine, r)
 
-	log.Println("listen on :80")
-	_ = r.Run(":80")
+	log.Println("listen on :" + config.SysConfigInstance.ServePort)
+	_ = r.Run(":" + config.SysConfigInstance.ServePort)
 }

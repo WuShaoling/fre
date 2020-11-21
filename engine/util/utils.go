@@ -1,11 +1,14 @@
 package util
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
-	"log"
 	"os"
+	"strconv"
+	"time"
 )
 
 func MkdirIfNotExist(p string) error {
@@ -26,14 +29,14 @@ func MkdirIfNotExist(p string) error {
 func WriteToFile(filename string, data []byte) error {
 	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0744)
 	if err != nil {
-		log.Printf("[error]: AppendOrCreate open file %s error, %+v\n", filename, err)
+		//log.Errorf("WriteToFile open file %s error, %v", filename, err)
 		return err
 	}
 	defer f.Close()
 
 	_, err = f.Write(data)
 	if err != nil {
-		log.Printf("[error]: AppendOrCreate write file %s error, %+v\n", filename, err)
+		//log.Errorf("WriteToFile write to file %s error, %v", filename, err)
 	}
 	return err
 }
@@ -41,13 +44,36 @@ func WriteToFile(filename string, data []byte) error {
 func ReadFromFile(filename string) ([]byte, error) {
 	f, err := os.Open(filename)
 	if err != nil {
+		//log.Errorf("ReadFromFile open file %s error, %v", filename, err)
 		return nil, err
 	}
 	defer f.Close()
 
 	data, err := ioutil.ReadAll(f)
 	if err != nil {
-		log.Printf("[error]: ReadFromFile read file %s error, %+v\n", filename, err)
+		//log.Errorf("ReadFromFile read file %s error, %v", filename, err)
 	}
 	return data, err
+}
+
+func WriteJsonDataToFile(filename string, v interface{}) error {
+	data, err := json.Marshal(v)
+	if err != nil {
+		log.Errorf("WriteJsonDataToFile json.Marshal error, filename=%s, data=%v, error=%v", filename, v, err)
+		return err
+	}
+	return WriteToFile(filename, data)
+}
+
+func LoadJsonDataFromFile(filename string, v interface{}) {
+	if data, err := ReadFromFile(filename); err == nil {
+		if e := json.Unmarshal(data, v); e != nil {
+			log.Errorf("LoadJsonDataFromFile json.Unmarshal error, filename=%s, error=%v", filename, err)
+		}
+	}
+	// 文件可能不存在，直接忽略
+}
+
+func UniqueId() string {
+	return strconv.FormatInt(time.Now().UnixNano(), 10)
 }
