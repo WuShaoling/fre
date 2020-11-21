@@ -46,11 +46,11 @@ func mount(id int) {
 	}
 
 	t2 := time.Now().UnixNano()
-	data := fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", "../rootfs", upperPath, workerPath)
+	data := fmt.Sprintf("lowerdir=%s,upperdir=%s,workdir=%s", "rootfs", upperPath, workerPath)
 	fmt.Println(data)
 	fmt.Println(mountPath)
 	if err := syscall.Mount("overlay", mountPath, "overlay", 0, data); err != nil {
-		log.Println(err)
+		log.Println("syscall.Mount", err)
 	}
 
 	t3 := time.Now().UnixNano()
