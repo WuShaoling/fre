@@ -22,7 +22,8 @@ type Service struct {
 	zygoteService *ZygoteService
 }
 
-func NewContainerService(containerExitCallback chan gin.H, functionResultCallback chan gin.H, runtimeList map[string]runtime.Runtime) *Service {
+func NewContainerService(containerExitCallback chan gin.H, functionResultCallback chan gin.H,
+	runtimeSet map[string]runtime.Runtime, templateSet map[string]template.Template) *Service {
 	service := &Service{
 		onContainerExitCallback:  containerExitCallback,
 		onFunctionResultCallback: functionResultCallback,
@@ -31,7 +32,7 @@ func NewContainerService(containerExitCallback chan gin.H, functionResultCallbac
 		fsService: NewFsService(),
 
 		cgroupService: NewCgroupService(),
-		zygoteService: NewZygoteService(runtimeList),
+		zygoteService: NewZygoteService(runtimeSet, templateSet),
 	}
 	util.LoadJsonDataFromFile(service.getDataFilePath(), &service.dataMap)
 	return service
@@ -67,10 +68,7 @@ func (service *Service) Create(requestId string, runtime runtime.Runtime, templa
 	}
 
 	// 基于 zygote 创建或者直接启动容器
-	zygoteProcess := service.zygoteService.SearchMatchProcess(template.Runtime)
-	if zygoteProcess != nil {
-		//err = service.newContainerProcessByZygote(template, container, zygoteProcess)
-	} else {
+	if err = service.newContainerProcessByZygote(runtime, template, container); err != nil {
 		err = service.newContainerProcessDirectly(runtime, template, container)
 	}
 	if err != nil {

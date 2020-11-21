@@ -2,6 +2,7 @@
 
 image=python:3.7
 name=python3.7
+workspace=../../engine/workspace
 
 # generate rootfs
 containerId=$(docker run -d ${image})
@@ -21,6 +22,12 @@ cp bootstrap.py ${name}/
 
 # 拷贝 demo 代码
 cp -r code ${name}
+
+# 拷贝 zygote 相关文件
+if [ ! -d "${workspace}/zygote/python3.7" ]; then
+  mkdir -p ${workspace}/zygote/python3.7
+fi
+cp -r zygote ${workspace}/zygote/python3.7
 
 ## 安装 demo 代码的依赖包
 docker run -it --rm --privileged -v $PWD:/root ${image} bash -c \

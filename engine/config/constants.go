@@ -6,6 +6,7 @@ const (
 	RuntimePath     = "runtime"   // 运行时环境目录
 	VolumeHostPath  = "volume"    // 数据卷主机端目录
 	ContainerFsPath = "container" // 容器文件系统目录
+	ZygoteCodePath  = "zygote"    // zygote代码目录
 )
 
 const (

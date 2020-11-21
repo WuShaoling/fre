@@ -21,6 +21,7 @@ type CgroupService struct {
 }
 
 func NewCgroupService() *CgroupService {
+	log.Info("NewCgroupService")
 	service := &CgroupService{
 		pool:    make([]string, 0, config.SysConfigInstance.CgroupPoolSize),
 		dataMap: make(map[string]*cgroups.Cgroup),

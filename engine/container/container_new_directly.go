@@ -6,7 +6,6 @@ import (
 	"engine/runtime"
 	"engine/template"
 	"errors"
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
@@ -21,7 +20,7 @@ func (service *Service) newContainerProcessDirectly(runtime runtime.Runtime, tem
 	// new pipe
 	readPipe, writePipe, err := os.Pipe()
 	if err != nil {
-		log.Error(fmt.Sprintf("newContainerProcessDirectly(id=%s) new pipe error, ", container.Id), err)
+		log.Errorf("newContainerProcessDirectly(id=%s) new pipe error, %+v", container.Id, err)
 		return err
 	}
 	defer writePipe.Close()
@@ -43,7 +42,7 @@ func (service *Service) newContainerProcessDirectly(runtime runtime.Runtime, tem
 	containerProcess.Stdout = os.Stdout
 	containerProcess.Stderr = os.Stderr
 	if err := containerProcess.Start(); err != nil {
-		log.Error(fmt.Sprintf("newContainerProcessDirectly(id=%s) start process error, ", container.Id), err)
+		log.Errorf("newContainerProcessDirectly(id=%s) start process error, %+v", container.Id, err)
 		service.onNewContainerProcessDirectlyError(readPipe, nil)
 		return err
 	}
